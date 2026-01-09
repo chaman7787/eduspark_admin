@@ -1,5 +1,5 @@
 import React from 'react';
-import { RiDashboardLine, RiTeamLine, RiUserLine, RiBookLine, RiFileList3Line, RiLogoutBoxLine } from 'react-icons/ri';
+import { RiDashboardLine, RiTeamLine, RiUserLine, RiBookLine, RiFileList3Line, RiLogoutBoxLine, RiWalletLine, RiShieldCheckLine, RiQuestionnaireLine, RiFeedbackLine, RiVideoLine } from 'react-icons/ri';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
@@ -22,14 +22,28 @@ export const Sidebar = () => {
 
   return (
     <div className="sidebar bg-dark text-white" style={{ minHeight: '100vh', width: '250px', padding: '20px', position: 'relative' }}>
+      {/* EduSpark Logo */}
+      <div className="text-center mb-3">
+        <img 
+          src="/logo.png" 
+          alt="EduSpark" 
+          style={{
+            width: '80px',
+            height: '80px',
+            objectFit: 'contain',
+            filter: 'drop-shadow(0 0 20px rgba(0, 173, 239, 0.5)) drop-shadow(0 0 40px rgba(255, 165, 0, 0.3))'
+          }}
+        />
+      </div>
       <h3 className="text-center mb-4" style={{
-        background: 'linear-gradient(135deg, #ff0064, #00c8ff)',
+        background: 'linear-gradient(135deg, #00ADEF, #FFA500)',
         WebkitBackgroundClip: 'text',
         WebkitTextFillColor: 'transparent',
         backgroundClip: 'text',
-        fontWeight: 'bold'
+        fontWeight: 'bold',
+        fontSize: '1.3rem'
       }}>
-        {adminData?.name || adminData?.email?.split('@')[0] || 'Admin Panel'}
+        {adminData?.name || adminData?.email?.split('@')[0] || 'Admin'}
       </h3>
       
       {adminData && (
@@ -39,21 +53,21 @@ export const Sidebar = () => {
               width: '50px',
               height: '50px',
               borderRadius: '50%',
-              background: 'linear-gradient(135deg, #ff0064, #00c8ff)',
+              background: 'linear-gradient(135deg, #00ADEF, #FFA500)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               fontWeight: 'bold',
               fontSize: '1.2rem',
               color: 'white',
-              boxShadow: '0 0 20px rgba(255, 0, 100, 0.3), 0 0 40px rgba(0, 200, 255, 0.2)',
+              boxShadow: '0 0 20px rgba(0, 173, 239, 0.4), 0 0 40px rgba(255, 165, 0, 0.3)',
               flexShrink: 0
             }}>
               {getInitials(adminData.name || adminData.email)}
             </div>
             <div style={{ flex: 1, minWidth: 0 }}>
               <p className="mb-0 fw-bold text-truncate" style={{
-                background: 'linear-gradient(135deg, #ff0064, #00c8ff)',
+                background: 'linear-gradient(135deg, #00ADEF, #FFA500)',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
                 backgroundClip: 'text',
@@ -76,8 +90,8 @@ export const Sidebar = () => {
           padding: '10px 15px'
         }}
         onMouseEnter={(e) => {
-          e.currentTarget.style.background = 'rgba(255, 0, 100, 0.1)';
-          e.currentTarget.style.borderLeft = '3px solid #ff0064';
+          e.currentTarget.style.background = 'rgba(0, 173, 239, 0.15)';
+          e.currentTarget.style.borderLeft = '3px solid #00ADEF';
           e.currentTarget.style.paddingLeft = '12px';
         }}
         onMouseLeave={(e) => {
@@ -93,8 +107,8 @@ export const Sidebar = () => {
           padding: '10px 15px'
         }}
         onMouseEnter={(e) => {
-          e.currentTarget.style.background = 'rgba(0, 200, 255, 0.1)';
-          e.currentTarget.style.borderLeft = '3px solid #00c8ff';
+          e.currentTarget.style.background = 'rgba(0, 173, 239, 0.15)';
+          e.currentTarget.style.borderLeft = '3px solid #00ADEF';
           e.currentTarget.style.paddingLeft = '12px';
         }}
         onMouseLeave={(e) => {
@@ -110,8 +124,8 @@ export const Sidebar = () => {
           padding: '10px 15px'
         }}
         onMouseEnter={(e) => {
-          e.currentTarget.style.background = 'rgba(100, 255, 0, 0.1)';
-          e.currentTarget.style.borderLeft = '3px solid #64ff00';
+          e.currentTarget.style.background = 'rgba(16, 185, 129, 0.15)';
+          e.currentTarget.style.borderLeft = '3px solid #10B981';
           e.currentTarget.style.paddingLeft = '12px';
         }}
         onMouseLeave={(e) => {
@@ -127,8 +141,8 @@ export const Sidebar = () => {
           padding: '10px 15px'
         }}
         onMouseEnter={(e) => {
-          e.currentTarget.style.background = 'rgba(255, 100, 0, 0.1)';
-          e.currentTarget.style.borderLeft = '3px solid #ff6400';
+          e.currentTarget.style.background = 'rgba(255, 165, 0, 0.15)';
+          e.currentTarget.style.borderLeft = '3px solid #FFA500';
           e.currentTarget.style.paddingLeft = '12px';
         }}
         onMouseLeave={(e) => {
@@ -138,14 +152,31 @@ export const Sidebar = () => {
         }}>
           <RiBookLine className="me-2" size={20} /> Courses
         </Link>
+        <Link to="/videos" className="nav-link text-white mb-3" style={{
+          transition: 'all 0.3s',
+          borderRadius: '8px',
+          padding: '10px 15px'
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.background = 'rgba(59, 130, 246, 0.15)';
+          e.currentTarget.style.borderLeft = '3px solid #3B82F6';
+          e.currentTarget.style.paddingLeft = '12px';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.background = 'transparent';
+          e.currentTarget.style.borderLeft = 'none';
+          e.currentTarget.style.paddingLeft = '15px';
+        }}>
+          <RiVideoLine className="me-2" size={20} /> Videos
+        </Link>
         <Link to="/test" className="nav-link text-white mb-3" style={{
           transition: 'all 0.3s',
           borderRadius: '8px',
           padding: '10px 15px'
         }}
         onMouseEnter={(e) => {
-          e.currentTarget.style.background = 'rgba(200, 0, 255, 0.1)';
-          e.currentTarget.style.borderLeft = '3px solid #c800ff';
+          e.currentTarget.style.background = 'rgba(139, 92, 246, 0.15)';
+          e.currentTarget.style.borderLeft = '3px solid #8B5CF6';
           e.currentTarget.style.paddingLeft = '12px';
         }}
         onMouseLeave={(e) => {
@@ -154,6 +185,74 @@ export const Sidebar = () => {
           e.currentTarget.style.paddingLeft = '15px';
         }}>
           <RiFileList3Line className="me-2" size={20} /> Test
+        </Link>
+        <Link to="/withdrawals" className="nav-link text-white mb-3" style={{
+          transition: 'all 0.3s',
+          borderRadius: '8px',
+          padding: '10px 15px'
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.background = 'rgba(255, 215, 0, 0.1)';
+          e.currentTarget.style.borderLeft = '3px solid #ffd700';
+          e.currentTarget.style.paddingLeft = '12px';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.background = 'transparent';
+          e.currentTarget.style.borderLeft = 'none';
+          e.currentTarget.style.paddingLeft = '15px';
+        }}>
+          <RiWalletLine className="me-2" size={20} /> Withdrawals
+        </Link>
+        <Link to="/kyc" className="nav-link text-white mb-3" style={{
+          transition: 'all 0.3s',
+          borderRadius: '8px',
+          padding: '10px 15px'
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.background = 'rgba(16, 185, 129, 0.15)';
+          e.currentTarget.style.borderLeft = '3px solid #10B981';
+          e.currentTarget.style.paddingLeft = '12px';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.background = 'transparent';
+          e.currentTarget.style.borderLeft = 'none';
+          e.currentTarget.style.paddingLeft = '15px';
+        }}>
+          <RiShieldCheckLine className="me-2" size={20} /> KYC Verification
+        </Link>
+        <Link to="/support" className="nav-link text-white mb-3" style={{
+          transition: 'all 0.3s',
+          borderRadius: '8px',
+          padding: '10px 15px'
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.background = 'rgba(0, 173, 239, 0.15)';
+          e.currentTarget.style.borderLeft = '3px solid #00ADEF';
+          e.currentTarget.style.paddingLeft = '12px';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.background = 'transparent';
+          e.currentTarget.style.borderLeft = 'none';
+          e.currentTarget.style.paddingLeft = '15px';
+        }}>
+          <RiQuestionnaireLine className="me-2" size={20} /> Support & Help
+        </Link>
+        <Link to="/feedback" className="nav-link text-white mb-3" style={{
+          transition: 'all 0.3s',
+          borderRadius: '8px',
+          padding: '10px 15px'
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.background = 'rgba(255, 215, 0, 0.15)';
+          e.currentTarget.style.borderLeft = '3px solid #FFD700';
+          e.currentTarget.style.paddingLeft = '12px';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.background = 'transparent';
+          e.currentTarget.style.borderLeft = 'none';
+          e.currentTarget.style.paddingLeft = '15px';
+        }}>
+          <RiFeedbackLine className="me-2" size={20} /> Feedback
         </Link>
         <button 
           onClick={handleLogout} 
@@ -165,8 +264,8 @@ export const Sidebar = () => {
             padding: '10px 15px'
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.background = 'rgba(255, 0, 0, 0.1)';
-            e.currentTarget.style.borderLeft = '3px solid #ff0000';
+            e.currentTarget.style.background = 'rgba(239, 68, 68, 0.15)';
+            e.currentTarget.style.borderLeft = '3px solid #EF4444';
             e.currentTarget.style.paddingLeft = '12px';
           }}
           onMouseLeave={(e) => {

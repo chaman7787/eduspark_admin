@@ -25,6 +25,21 @@ export const Courses = () => {
   const [searchTerm, setSearchTerm] = useState('')
   const [filteredCourses, setFilteredCourses] = useState([])
   const [saving, setSaving] = useState(false)
+  
+  // Playlist management state
+  const [isPlaylistModalOpen, setIsPlaylistModalOpen] = useState(false)
+  const [selectedCourseForPlaylist, setSelectedCourseForPlaylist] = useState(null)
+  const [playlistItems, setPlaylistItems] = useState([])
+  const [isLoadingPlaylist, setIsLoadingPlaylist] = useState(false)
+  const [playlistForm, setPlaylistForm] = useState({
+    title: '',
+    description: '',
+    contentType: 'video',
+    isFree: false,
+    video: null,
+    thumbnail: null
+  })
+  const [savingPlaylist, setSavingPlaylist] = useState(false)
 
   useEffect(() => {
     fetchCourses();
@@ -201,6 +216,142 @@ export const Courses = () => {
     }
   };
 
+  // Playlist management functions
+  const handleManagePlaylist = async (course) => {
+    setSelectedCourseForPlaylist(course);
+    setIsPlaylistModalOpen(true);
+    await fetchPlaylistItems(course._id);
+  };
+
+  const handleClosePlaylistModal = () => {
+    setIsPlaylistModalOpen(false);
+    setSelectedCourseForPlaylist(null);
+    setPlaylistItems([]);
+    setPlaylistForm({
+      title: '',
+      description: '',
+      contentType: 'video',
+      isFree: false,
+      video: null,
+      thumbnail: null
+    });
+  };
+
+  const fetchPlaylistItems = async (courseId) => {
+    try {
+      setIsLoadingPlaylist(true);
+      const response = await adminAPI.getCoursePlaylist(courseId);
+      if (response.success && response.playlistItems) {
+        setPlaylistItems(response.playlistItems);
+      } else if (response.success && response.playlist) {
+        // Fallback for different response format
+        setPlaylistItems(response.playlist);
+      } else {
+        setPlaylistItems([]);
+      }
+    } catch (err) {
+      console.error('Error fetching playlist:', err);
+      setPlaylistItems([]);
+    } finally {
+      setIsLoadingPlaylist(false);
+    }
+  };
+
+  const handlePlaylistFormChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    if (type === 'checkbox') {
+      setPlaylistForm(prev => ({ ...prev, [name]: checked }));
+    } else {
+      setPlaylistForm(prev => ({ ...prev, [name]: value }));
+    }
+  };
+
+  const handlePlaylistFileChange = (e) => {
+    const { name, files } = e.target;
+    if (files && files[0]) {
+      setPlaylistForm(prev => ({ ...prev, [name]: files[0] }));
+    }
+  };
+
+  const handleSavePlaylistItem = async () => {
+    const title = (playlistForm.title || '').trim();
+    const description = (playlistForm.description || '').trim();
+
+    if (!title) {
+      alert('Title is required');
+      return;
+    }
+    if (!description) {
+      alert('Description is required');
+      return;
+    }
+    if (!playlistForm.thumbnail) {
+      alert('Thumbnail is required');
+      return;
+    }
+    if (['video', 'audio', 'full', 'reel'].includes(playlistForm.contentType) && !playlistForm.video) {
+      alert('Video file is required for video/audio content type');
+      return;
+    }
+
+    try {
+      setSavingPlaylist(true);
+      setError(null);
+
+      const playlistData = {
+        title,
+        description,
+        contentType: playlistForm.contentType,
+        category: 'general', // Default category
+        isFree: playlistForm.isFree
+      };
+
+      const response = await adminAPI.createPlaylistItem(
+        selectedCourseForPlaylist._id,
+        playlistData,
+        playlistForm.video,
+        playlistForm.thumbnail
+      );
+
+      if (response.success) {
+        await fetchPlaylistItems(selectedCourseForPlaylist._id);
+        setPlaylistForm({
+          title: '',
+          description: '',
+          contentType: 'video',
+          isFree: false,
+          video: null,
+          thumbnail: null
+        });
+      } else {
+        throw new Error(response.message || 'Failed to create playlist item');
+      }
+    } catch (err) {
+      console.error('Error saving playlist item:', err);
+      setError(err.message || 'Failed to create playlist item');
+    } finally {
+      setSavingPlaylist(false);
+    }
+  };
+
+  const handleDeletePlaylistItem = async (itemId) => {
+    if (!window.confirm('Are you sure you want to delete this playlist item?')) {
+      return;
+    }
+
+    try {
+      const response = await adminAPI.deletePlaylistItem(selectedCourseForPlaylist._id, itemId);
+      if (response.success) {
+        await fetchPlaylistItems(selectedCourseForPlaylist._id);
+      } else {
+        throw new Error(response.message || 'Failed to delete playlist item');
+      }
+    } catch (err) {
+      console.error('Error deleting playlist item:', err);
+      alert(err.message || 'Failed to delete playlist item');
+    }
+  };
+
   const handleSave = async () => {
     const title = (form.title || '').trim();
     const description = (form.description || '').trim();
@@ -347,6 +498,7 @@ export const Courses = () => {
                   <th style={{ width: 100 }}>Thumbnail</th>
                   <th>Title</th>
                   <th>Description</th>
+                  <th>Teacher</th>
                   <th>Price</th>
                   <th style={{ width: 160 }} className="text-center">Actions</th>
                 </tr>
@@ -354,7 +506,7 @@ export const Courses = () => {
               <tbody>
                 {filteredCourses.length === 0 ? (
                   <tr>
-                    <td colSpan="5" className="text-center py-4">
+                    <td colSpan="6" className="text-center py-4">
                       {searchTerm ? 'No courses found matching your search' : 'No courses available'}
                     </td>
                   </tr>
@@ -397,6 +549,16 @@ export const Courses = () => {
                           {course.description || 'No description'}
                         </div>
                       </td>
+                      <td>
+                        {course.teacher ? (
+                          <div>
+                            <div className="fw-semibold">{course.teacher.name || 'N/A'}</div>
+                            <div className="text-muted small">{course.teacher.email || ''}</div>
+                          </div>
+                        ) : (
+                          <span className="badge bg-secondary">Admin Created</span>
+                        )}
+                      </td>
                       <td>₹{course.price || 0}</td>
                       <td className="text-center">
                         <button 
@@ -404,6 +566,12 @@ export const Courses = () => {
                           className="btn btn-outline-primary btn-sm me-2"
                         >
                           Edit
+                        </button>
+                        <button 
+                          onClick={() => handleManagePlaylist(course)} 
+                          className="btn btn-outline-success btn-sm me-2"
+                        >
+                          Playlist
                         </button>
                         <button 
                           onClick={() => handleDelete(course)} 
@@ -633,6 +801,219 @@ export const Courses = () => {
                     ) : (
                       selectedCourse ? 'Update Course' : 'Create Course'
                     )}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* Playlist Management Modal */}
+      {isPlaylistModalOpen && selectedCourseForPlaylist && (
+        <>
+          <div className="modal-backdrop fade show"></div>
+          <div className="modal fade show d-block" tabIndex="-1" role="dialog" aria-modal="true">
+            <div className="modal-dialog modal-dialog-centered modal-xl" style={{ maxWidth: '1000px' }}>
+              <div className="modal-content">
+                <div className="modal-header">
+                  <h5 className="modal-title">
+                    Manage Playlist - {selectedCourseForPlaylist.title}
+                  </h5>
+                  <button 
+                    type="button" 
+                    className="btn-close" 
+                    aria-label="Close" 
+                    onClick={handleClosePlaylistModal}
+                  ></button>
+                </div>
+                <div className="modal-body" style={{ maxHeight: '70vh', overflowY: 'auto' }}>
+                  {error && (
+                    <div className="alert alert-danger" role="alert">
+                      {error}
+                    </div>
+                  )}
+
+                  {/* Add New Playlist Item Form */}
+                  <div className="card mb-4">
+                    <div className="card-header">
+                      <h6 className="mb-0">Add New Playlist Video</h6>
+                    </div>
+                    <div className="card-body">
+                      <form>
+                        <div className="row">
+                          <div className="col-md-6 mb-3">
+                            <label className="form-label">Title *</label>
+                            <input 
+                              name="title" 
+                              value={playlistForm.title} 
+                              onChange={handlePlaylistFormChange} 
+                              type="text" 
+                              className="form-control" 
+                              required
+                              disabled={savingPlaylist}
+                            />
+                          </div>
+                          <div className="col-md-6 mb-3">
+                            <label className="form-label">Content Type *</label>
+                            <select 
+                              name="contentType" 
+                              value={playlistForm.contentType} 
+                              onChange={handlePlaylistFormChange}
+                              className="form-select"
+                              required
+                              disabled={savingPlaylist}
+                            >
+                              <option value="video">Video</option>
+                              <option value="audio">Audio</option>
+                              <option value="full">Full Video</option>
+                              <option value="reel">Reel</option>
+                              <option value="document">Document</option>
+                              <option value="text">Text</option>
+                            </select>
+                          </div>
+                        </div>
+                        <div className="mb-3">
+                          <label className="form-label">Description *</label>
+                          <textarea 
+                            name="description" 
+                            value={playlistForm.description} 
+                            onChange={handlePlaylistFormChange} 
+                            className="form-control" 
+                            rows="3"
+                            required
+                            disabled={savingPlaylist}
+                          />
+                        </div>
+                        <div className="row">
+                          <div className="col-md-6 mb-3">
+                            <label className="form-label">Video File *</label>
+                            <input 
+                              name="video" 
+                              type="file" 
+                              accept="video/*,audio/*"
+                              onChange={handlePlaylistFileChange}
+                              className="form-control"
+                              disabled={savingPlaylist}
+                            />
+                            <small className="text-muted">
+                              Required for video/audio content types
+                            </small>
+                          </div>
+                          <div className="col-md-6 mb-3">
+                            <label className="form-label">Thumbnail *</label>
+                            <input 
+                              name="thumbnail" 
+                              type="file" 
+                              accept="image/*"
+                              onChange={handlePlaylistFileChange}
+                              className="form-control"
+                              required
+                              disabled={savingPlaylist}
+                            />
+                          </div>
+                        </div>
+                        <div className="mb-3">
+                          <div className="form-check">
+                            <input 
+                              name="isFree" 
+                              type="checkbox" 
+                              checked={playlistForm.isFree} 
+                              onChange={handlePlaylistFormChange}
+                              className="form-check-input"
+                              disabled={savingPlaylist}
+                            />
+                            <label className="form-check-label">
+                              Free (First video can be free)
+                            </label>
+                          </div>
+                        </div>
+                        <button 
+                          type="button" 
+                          className="btn btn-primary" 
+                          onClick={handleSavePlaylistItem}
+                          disabled={savingPlaylist}
+                        >
+                          {savingPlaylist ? (
+                            <>
+                              <span className="spinner-border spinner-border-sm me-2" role="status"></span>
+                              Adding...
+                            </>
+                          ) : (
+                            'Add to Playlist'
+                          )}
+                        </button>
+                      </form>
+                    </div>
+                  </div>
+
+                  {/* Existing Playlist Items */}
+                  <div className="card">
+                    <div className="card-header">
+                      <h6 className="mb-0">Playlist Items ({playlistItems.length})</h6>
+                    </div>
+                    <div className="card-body">
+                      {isLoadingPlaylist ? (
+                        <div className="text-center py-4">
+                          <div className="spinner-border text-primary" role="status">
+                            <span className="visually-hidden">Loading...</span>
+                          </div>
+                        </div>
+                      ) : playlistItems.length === 0 ? (
+                        <div className="text-center py-4 text-muted">
+                          No playlist items yet. Add your first video above.
+                        </div>
+                      ) : (
+                        <div className="table-responsive">
+                          <table className="table table-sm">
+                            <thead>
+                              <tr>
+                                <th>Order</th>
+                                <th>Title</th>
+                                <th>Type</th>
+                                <th>Free</th>
+                                <th>Actions</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {playlistItems.map((item, index) => (
+                                <tr key={item._id}>
+                                  <td>{index + 1}</td>
+                                  <td>{item.title}</td>
+                                  <td>
+                                    <span className="badge bg-info">{item.contentType}</span>
+                                  </td>
+                                  <td>
+                                    {item.isFree ? (
+                                      <span className="badge bg-success">Free</span>
+                                    ) : (
+                                      <span className="badge bg-secondary">Paid</span>
+                                    )}
+                                  </td>
+                                  <td>
+                                    <button 
+                                      onClick={() => handleDeletePlaylistItem(item._id)} 
+                                      className="btn btn-outline-danger btn-sm"
+                                    >
+                                      Delete
+                                    </button>
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+                <div className="modal-footer">
+                  <button 
+                    type="button" 
+                    className="btn btn-secondary" 
+                    onClick={handleClosePlaylistModal}
+                  >
+                    Close
                   </button>
                 </div>
               </div>

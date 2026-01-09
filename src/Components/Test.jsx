@@ -19,7 +19,16 @@ export const Test = () => {
     totalDuration: '', 
     totalMarks: '',
     level: '',
-    questions: []
+    questions: [],
+    isPaid: false,
+    entryFee: '',
+    prizePool: '',
+    maxParticipants: '',
+    prizeDistribution: {
+      first: '50',
+      second: '30',
+      third: '20'
+    }
   })
   const [searchTerm, setSearchTerm] = useState('')
   const [filteredQuizzes, setFilteredQuizzes] = useState([])
@@ -106,7 +115,20 @@ export const Test = () => {
         options: q.options || ['', '', '', ''],
         correctAnswer: q.correctAnswer || 0,
         timeLimit: q.timeLimit || 30
-      })) : []
+      })) : [],
+      isPaid: quiz.isPaid || false,
+      entryFee: quiz.entryFee?.toString() || '',
+      prizePool: quiz.prizePool?.toString() || '',
+      maxParticipants: quiz.maxParticipants?.toString() || '',
+      prizeDistribution: quiz.prizeDistribution ? {
+        first: quiz.prizeDistribution.first?.toString() || '50',
+        second: quiz.prizeDistribution.second?.toString() || '30',
+        third: quiz.prizeDistribution.third?.toString() || '20'
+      } : {
+        first: '50',
+        second: '30',
+        third: '20'
+      }
     });
     setIsModalOpen(true);
   };
@@ -169,7 +191,16 @@ export const Test = () => {
       totalDuration: '',
       totalMarks: '',
       level: '',
-      questions: []
+      questions: [],
+      isPaid: false,
+      entryFee: '',
+      prizePool: '',
+      maxParticipants: '',
+      prizeDistribution: {
+        first: '50',
+        second: '30',
+        third: '20'
+      }
     });
     setIsModalOpen(true);
   };
@@ -187,7 +218,16 @@ export const Test = () => {
       totalDuration: '',
       totalMarks: '',
       level: '',
-      questions: []
+      questions: [],
+      isPaid: false,
+      entryFee: '',
+      prizePool: '',
+      maxParticipants: '',
+      prizeDistribution: {
+        first: '50',
+        second: '30',
+        third: '20'
+      }
     });
     setError(null);
   };
@@ -344,6 +384,64 @@ export const Test = () => {
 
       if (form.level) {
         quizData.level = form.level;
+      }
+
+      // Add paid quiz fields if isPaid is true
+      if (form.isPaid) {
+        const entryFee = parseFloat(form.entryFee);
+        const prizePool = parseFloat(form.prizePool);
+        
+        if (isNaN(entryFee) || entryFee <= 0) {
+          alert('Entry fee must be a valid number greater than 0');
+          return;
+        }
+        
+        if (isNaN(prizePool) || prizePool <= 0) {
+          alert('Prize pool must be a valid number greater than 0');
+          return;
+        }
+        
+        // Validate prize distribution
+        const prizeDist = form.prizeDistribution || { first: '50', second: '30', third: '20' };
+        const first = parseFloat(prizeDist.first) || 0;
+        const second = parseFloat(prizeDist.second) || 0;
+        const third = parseFloat(prizeDist.third) || 0;
+        
+        if (isNaN(first) || isNaN(second) || isNaN(third)) {
+          alert('Prize distribution percentages must be valid numbers');
+          return;
+        }
+        
+        if (first < 0 || second < 0 || third < 0) {
+          alert('Prize distribution percentages cannot be negative');
+          return;
+        }
+        
+        const total = first + second + third;
+        if (Math.abs(total - 100) > 0.01) { // Allow small floating point differences
+          alert(`Prize distribution percentages must add up to 100%. Current total: ${total.toFixed(2)}%`);
+          return;
+        }
+        
+        quizData.isPaid = true;
+        quizData.entryFee = entryFee;
+        quizData.prizePool = prizePool;
+        quizData.prizeDistribution = {
+          first: first,
+          second: second,
+          third: third
+        };
+        
+        if (form.maxParticipants) {
+          const maxParticipants = parseInt(form.maxParticipants);
+          if (!isNaN(maxParticipants) && maxParticipants > 0) {
+            quizData.maxParticipants = maxParticipants;
+          }
+        }
+      } else {
+        quizData.isPaid = false;
+        quizData.entryFee = 0;
+        quizData.prizePool = 0;
       }
 
       let response;
@@ -650,6 +748,183 @@ export const Test = () => {
                           <option value="advanced">Advanced</option>
                           <option value="expert">Expert</option>
                         </select>
+                      </div>
+                    </div>
+
+                    {/* Paid Quiz Section */}
+                    <div className="mb-4">
+                      <div className="card border-primary">
+                        <div className="card-header bg-primary text-white">
+                          <h6 className="mb-0">Paid Quiz Settings</h6>
+                        </div>
+                        <div className="card-body">
+                          <div className="mb-3">
+                            <div className="form-check">
+                              <input 
+                                className="form-check-input" 
+                                type="checkbox" 
+                                name="isPaid"
+                                checked={form.isPaid}
+                                onChange={(e) => setForm(prev => ({ 
+                                  ...prev, 
+                                  isPaid: e.target.checked,
+                                  prizeDistribution: prev.prizeDistribution || {
+                                    first: '50',
+                                    second: '30',
+                                    third: '20'
+                                  }
+                                }))}
+                                id="isPaid"
+                                disabled={saving}
+                              />
+                              <label className="form-check-label" htmlFor="isPaid">
+                                Make this a paid quiz (students need to pay to enroll)
+                              </label>
+                            </div>
+                          </div>
+
+                          {form.isPaid && (
+                            <>
+                              <div className="row mb-3">
+                                <div className="col-md-6">
+                                  <label className="form-label">Entry Fee (₹) *</label>
+                                  <input 
+                                    name="entryFee" 
+                                    value={form.entryFee} 
+                                    onChange={handleChange} 
+                                    type="number" 
+                                    className="form-control" 
+                                    min="1"
+                                    step="0.01"
+                                    required={form.isPaid}
+                                    disabled={saving}
+                                    placeholder="e.g., 100"
+                                  />
+                                  <small className="text-muted">Amount students need to pay to enroll</small>
+                                </div>
+                                <div className="col-md-6">
+                                  <label className="form-label">Prize Pool (₹) *</label>
+                                  <input 
+                                    name="prizePool" 
+                                    value={form.prizePool} 
+                                    onChange={handleChange} 
+                                    type="number" 
+                                    className="form-control" 
+                                    min="1"
+                                    step="0.01"
+                                    required={form.isPaid}
+                                    disabled={saving}
+                                    placeholder="e.g., 1000"
+                                  />
+                                  <small className="text-muted">Total prize money for winners</small>
+                                </div>
+                              </div>
+                              <div className="mb-3">
+                                <label className="form-label">Max Participants (Optional)</label>
+                                <input 
+                                  name="maxParticipants" 
+                                  value={form.maxParticipants} 
+                                  onChange={handleChange} 
+                                  type="number" 
+                                  className="form-control" 
+                                  min="1"
+                                  disabled={saving}
+                                  placeholder="Leave empty for unlimited"
+                                />
+                                <small className="text-muted">Maximum number of students who can enroll (0 = unlimited)</small>
+                              </div>
+                              {/* Prize Distribution */}
+                              <div className="mb-3">
+                                <label className="form-label">Prize Distribution (%) *</label>
+                                <div className="row">
+                                  <div className="col-md-4 mb-2">
+                                    <label className="form-label small">1st Place</label>
+                                    <input 
+                                      name="prizeFirst" 
+                                      value={form.prizeDistribution?.first || '50'} 
+                                      onChange={(e) => setForm(prev => ({
+                                        ...prev,
+                                        prizeDistribution: {
+                                          first: e.target.value,
+                                          second: prev.prizeDistribution?.second || '30',
+                                          third: prev.prizeDistribution?.third || '20'
+                                        }
+                                      }))}
+                                      type="number" 
+                                      className="form-control" 
+                                      min="0"
+                                      max="100"
+                                      step="0.01"
+                                      required={form.isPaid}
+                                      disabled={saving}
+                                      placeholder="50"
+                                    />
+                                  </div>
+                                  <div className="col-md-4 mb-2">
+                                    <label className="form-label small">2nd Place</label>
+                                    <input 
+                                      name="prizeSecond" 
+                                      value={form.prizeDistribution?.second || '30'} 
+                                      onChange={(e) => setForm(prev => ({
+                                        ...prev,
+                                        prizeDistribution: {
+                                          first: prev.prizeDistribution?.first || '50',
+                                          second: e.target.value,
+                                          third: prev.prizeDistribution?.third || '20'
+                                        }
+                                      }))}
+                                      type="number" 
+                                      className="form-control" 
+                                      min="0"
+                                      max="100"
+                                      step="0.01"
+                                      required={form.isPaid}
+                                      disabled={saving}
+                                      placeholder="30"
+                                    />
+                                  </div>
+                                  <div className="col-md-4 mb-2">
+                                    <label className="form-label small">3rd Place</label>
+                                    <input 
+                                      name="prizeThird" 
+                                      value={form.prizeDistribution?.third || '20'} 
+                                      onChange={(e) => setForm(prev => ({
+                                        ...prev,
+                                        prizeDistribution: {
+                                          first: prev.prizeDistribution?.first || '50',
+                                          second: prev.prizeDistribution?.second || '30',
+                                          third: e.target.value
+                                        }
+                                      }))}
+                                      type="number" 
+                                      className="form-control" 
+                                      min="0"
+                                      max="100"
+                                      step="0.01"
+                                      required={form.isPaid}
+                                      disabled={saving}
+                                      placeholder="20"
+                                    />
+                                  </div>
+                                </div>
+                                <small className="text-muted">
+                                  Total: {
+                                    (parseFloat(form.prizeDistribution?.first || '50') || 0) + 
+                                    (parseFloat(form.prizeDistribution?.second || '30') || 0) + 
+                                    (parseFloat(form.prizeDistribution?.third || '20') || 0)
+                                  }%
+                                  {Math.abs(
+                                    (parseFloat(form.prizeDistribution?.first || '50') || 0) + 
+                                    (parseFloat(form.prizeDistribution?.second || '30') || 0) + 
+                                    (parseFloat(form.prizeDistribution?.third || '20') || 0) - 100
+                                  ) > 0.01 && (
+                                    <span className="text-danger"> (Must equal 100%)</span>
+                                  )}
+                                </small>
+                              </div>
+                            </>
+                          )}
+                        </div>
                       </div>
                     </div>
 

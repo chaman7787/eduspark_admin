@@ -451,6 +451,118 @@ export const adminAPI = {
     }
   },
 
+  // Create Playlist Item for Course
+  createPlaylistItem: async (courseId, playlistData, videoFile, thumbnailFile) => {
+    try {
+      const formData = new FormData();
+      
+      // Add text fields
+      formData.append('title', playlistData.title);
+      formData.append('description', playlistData.description);
+      formData.append('contentType', playlistData.contentType || 'video');
+      formData.append('category', playlistData.category || 'general');
+      if (playlistData.isFree !== undefined) {
+        formData.append('isFree', playlistData.isFree.toString());
+      }
+      
+      // Add files
+      if (videoFile) {
+        formData.append('video', videoFile);
+      }
+      if (thumbnailFile) {
+        formData.append('thumbnail', thumbnailFile);
+      }
+
+      const token = getToken();
+      // Use /api/playlists instead of /api/admin/playlist
+      const baseUrl = API_BASE_URL.replace('/api/admin', '/api');
+      const response = await fetch(`${baseUrl}/playlists/${courseId}/items`, {
+        method: 'POST',
+        headers: {
+          ...(token && { Authorization: `Bearer ${token}` }),
+        },
+        body: formData,
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        if (response.status === 401 || response.status === 403) {
+          adminAPI.logout();
+          throw new Error('Session expired. Please login again.');
+        }
+        throw new Error(result.message || 'Failed to create playlist item');
+      }
+
+      return result;
+    } catch (error) {
+      console.error('Create playlist item error:', error);
+      throw error;
+    }
+  },
+
+  // Get Course Playlist
+  getCoursePlaylist: async (courseId) => {
+    try {
+      const token = getToken();
+      // Use /api/playlists instead of /api/admin/playlists
+      const baseUrl = API_BASE_URL.replace('/api/admin', '/api');
+      const response = await fetch(`${baseUrl}/playlists/${courseId}/items`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token && { Authorization: `Bearer ${token}` }),
+        },
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        if (response.status === 401 || response.status === 403) {
+          adminAPI.logout();
+          throw new Error('Session expired. Please login again.');
+        }
+        throw new Error(result.message || 'Failed to fetch playlist');
+      }
+
+      return result;
+    } catch (error) {
+      console.error('Get playlist error:', error);
+      throw error;
+    }
+  },
+
+  // Delete Playlist Item
+  deletePlaylistItem: async (courseId, itemId) => {
+    try {
+      const token = getToken();
+      // Use /api/playlists instead of /api/admin/playlists
+      const baseUrl = API_BASE_URL.replace('/api/admin', '/api');
+      const response = await fetch(`${baseUrl}/playlists/${courseId}/items/${itemId}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token && { Authorization: `Bearer ${token}` }),
+        },
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        if (response.status === 401 || response.status === 403) {
+          adminAPI.logout();
+          throw new Error('Session expired. Please login again.');
+        }
+        throw new Error(result.message || 'Failed to delete playlist item');
+      }
+
+      return result;
+    } catch (error) {
+      console.error('Delete playlist item error:', error);
+      throw error;
+    }
+  },
+
   // Update Course
   updateCourse: async (id, courseData) => {
     try {
@@ -612,6 +724,334 @@ export const adminAPI = {
       return data;
     } catch (error) {
       console.error('Get quiz rankings error:', error);
+      throw error;
+    }
+  },
+
+  // Get All Withdrawals
+  getWithdrawals: async (page = 1, limit = 10, status = '', userId = '', paymentMethod = '') => {
+    try {
+      const params = new URLSearchParams({
+        page: page.toString(),
+        limit: limit.toString(),
+      });
+      if (status) params.append('status', status);
+      if (userId) params.append('userId', userId);
+      if (paymentMethod) params.append('paymentMethod', paymentMethod);
+
+      const response = await fetch(`${API_BASE_URL}/withdrawals?${params}`, {
+        method: 'GET',
+        headers: getAuthHeaders(),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        if (response.status === 401 || response.status === 403) {
+          adminAPI.logout();
+          throw new Error('Session expired. Please login again.');
+        }
+        throw new Error(data.message || 'Failed to fetch withdrawals');
+      }
+
+      return data;
+    } catch (error) {
+      console.error('Get withdrawals error:', error);
+      throw error;
+    }
+  },
+
+  // Approve Withdrawal
+  approveWithdrawal: async (id) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/withdrawals/${id}/approve`, {
+        method: 'PUT',
+        headers: getAuthHeaders(),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        if (response.status === 401 || response.status === 403) {
+          adminAPI.logout();
+          throw new Error('Session expired. Please login again.');
+        }
+        throw new Error(result.message || 'Failed to approve withdrawal');
+      }
+
+      return result;
+    } catch (error) {
+      console.error('Approve withdrawal error:', error);
+      throw error;
+    }
+  },
+
+  // Reject Withdrawal
+  rejectWithdrawal: async (id, rejectionReason = '') => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/withdrawals/${id}/reject`, {
+        method: 'PUT',
+        headers: getAuthHeaders(),
+        body: JSON.stringify({ rejectionReason }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        if (response.status === 401 || response.status === 403) {
+          adminAPI.logout();
+          throw new Error('Session expired. Please login again.');
+        }
+        throw new Error(result.message || 'Failed to reject withdrawal');
+      }
+
+      return result;
+    } catch (error) {
+      console.error('Reject withdrawal error:', error);
+      throw error;
+    }
+  },
+
+  // Complete Withdrawal
+  completeWithdrawal: async (id, transactionId = '', remarks = '') => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/withdrawals/${id}/complete`, {
+        method: 'PUT',
+        headers: getAuthHeaders(),
+        body: JSON.stringify({ transactionId, remarks }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        if (response.status === 401 || response.status === 403) {
+          adminAPI.logout();
+          throw new Error('Session expired. Please login again.');
+        }
+        throw new Error(result.message || 'Failed to complete withdrawal');
+      }
+
+      return result;
+    } catch (error) {
+      console.error('Complete withdrawal error:', error);
+      throw error;
+    }
+  },
+
+  // Get Teachers Paid Quiz Status
+  getTeachersPaidQuizStatus: async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/teachers/paid-quiz-status/all`, {
+        method: 'GET',
+        headers: getAuthHeaders(),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        if (response.status === 401 || response.status === 403) {
+          adminAPI.logout();
+          throw new Error('Session expired. Please login again.');
+        }
+        throw new Error(data.message || 'Failed to fetch teachers paid quiz status');
+      }
+
+      return data;
+    } catch (error) {
+      console.error('Get teachers paid quiz status error:', error);
+      throw error;
+    }
+  },
+
+  // Toggle Teacher Paid Quiz Permission
+  toggleTeacherPaidQuizPermission: async (teacherId, canCreatePaidQuiz) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/teachers/${teacherId}/paid-quiz-permission`, {
+        method: 'PUT',
+        headers: getAuthHeaders(),
+        body: JSON.stringify({ canCreatePaidQuiz }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        if (response.status === 401 || response.status === 403) {
+          adminAPI.logout();
+          throw new Error('Session expired. Please login again.');
+        }
+        throw new Error(result.message || 'Failed to update paid quiz permission');
+      }
+
+      return result;
+    } catch (error) {
+      console.error('Toggle paid quiz permission error:', error);
+      throw error;
+    }
+  },
+
+  // Get All Videos
+  getVideos: async (page = 1, limit = 10, contentType = '', search = '') => {
+    try {
+      const params = new URLSearchParams({
+        page: page.toString(),
+        limit: limit.toString(),
+        ...(contentType && { contentType }),
+        ...(search && { search }),
+      });
+
+      const response = await fetch(`${API_BASE_URL}/videos?${params}`, {
+        method: 'GET',
+        headers: getAuthHeaders(),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        if (response.status === 401 || response.status === 403) {
+          adminAPI.logout();
+          throw new Error('Session expired. Please login again.');
+        }
+        throw new Error(data.message || 'Failed to fetch videos');
+      }
+
+      return data;
+    } catch (error) {
+      console.error('Get videos error:', error);
+      throw error;
+    }
+  },
+
+  // Create Video
+  createVideo: async (videoData, videoFile, thumbnailFile) => {
+    try {
+      const formData = new FormData();
+      
+      // Add text fields
+      formData.append('title', videoData.title);
+      formData.append('description', videoData.description);
+      formData.append('contentType', videoData.contentType || 'full');
+      formData.append('teacherId', videoData.teacherId);
+      if (videoData.category) {
+        if (Array.isArray(videoData.category)) {
+          videoData.category.forEach(cat => formData.append('category', cat));
+        } else {
+          formData.append('category', videoData.category);
+        }
+      }
+      if (videoData.customCategory) {
+        formData.append('customCategory', videoData.customCategory);
+      }
+
+      // Add files
+      if (videoFile) {
+        formData.append('video', videoFile);
+      }
+      if (thumbnailFile) {
+        formData.append('thumbnail', thumbnailFile);
+      }
+
+      const token = getToken();
+      const response = await fetch(`${API_BASE_URL}/videos`, {
+        method: 'POST',
+        headers: {
+          ...(token && { Authorization: `Bearer ${token}` }),
+        },
+        body: formData,
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        if (response.status === 401 || response.status === 403) {
+          adminAPI.logout();
+          throw new Error('Session expired. Please login again.');
+        }
+        throw new Error(result.message || 'Failed to create video');
+      }
+
+      return result;
+    } catch (error) {
+      console.error('Create video error:', error);
+      throw error;
+    }
+  },
+
+  // Update Video
+  updateVideo: async (videoId, videoData, videoFile = null, thumbnailFile = null) => {
+    try {
+      const formData = new FormData();
+      
+      // Add text fields
+      if (videoData.title) formData.append('title', videoData.title);
+      if (videoData.description) formData.append('description', videoData.description);
+      if (videoData.contentType) formData.append('contentType', videoData.contentType);
+      if (videoData.teacherId) formData.append('teacherId', videoData.teacherId);
+      if (videoData.category !== undefined) {
+        if (Array.isArray(videoData.category)) {
+          videoData.category.forEach(cat => formData.append('category', cat));
+        } else {
+          formData.append('category', videoData.category);
+        }
+      }
+      if (videoData.customCategory !== undefined) {
+        formData.append('customCategory', videoData.customCategory);
+      }
+
+      // Add files if provided
+      if (videoFile) {
+        formData.append('video', videoFile);
+      }
+      if (thumbnailFile) {
+        formData.append('thumbnail', thumbnailFile);
+      }
+
+      const token = getToken();
+      const response = await fetch(`${API_BASE_URL}/videos/${videoId}`, {
+        method: 'PUT',
+        headers: {
+          ...(token && { Authorization: `Bearer ${token}` }),
+        },
+        body: formData,
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        if (response.status === 401 || response.status === 403) {
+          adminAPI.logout();
+          throw new Error('Session expired. Please login again.');
+        }
+        throw new Error(result.message || 'Failed to update video');
+      }
+
+      return result;
+    } catch (error) {
+      console.error('Update video error:', error);
+      throw error;
+    }
+  },
+
+  // Delete Video
+  deleteVideo: async (videoId) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/videos/${videoId}`, {
+        method: 'DELETE',
+        headers: getAuthHeaders(),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        if (response.status === 401 || response.status === 403) {
+          adminAPI.logout();
+          throw new Error('Session expired. Please login again.');
+        }
+        throw new Error(result.message || 'Failed to delete video');
+      }
+
+      return result;
+    } catch (error) {
+      console.error('Delete video error:', error);
       throw error;
     }
   },

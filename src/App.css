@@ -1,6 +1,22 @@
-/* RGB Admin Panel Theme */
+/* EduSpark Admin Panel Theme - Matching Frontend */
+/* Brand Colors: Primary Blue (#00ADEF), Secondary Orange (#FFA500), Accent Yellow (#FFD700) */
+
+:root {
+  --primary-blue: #00ADEF;
+  --secondary-orange: #FFA500;
+  --accent-yellow: #FFD700;
+  --background-dark: #000000;
+  --background-dark-blue: #1a1a2e;
+  --background-navy: #16213e;
+  --background-deep-purple: #0F0F23;
+  --background-midnight: #1E1E2E;
+  --text-white: #FFFFFF;
+  --text-gray-light: #D1D5DB;
+  --text-gray: #9CA3AF;
+}
+
 body {
-  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+  background: linear-gradient(135deg, var(--background-dark) 0%, var(--background-dark-blue) 50%, var(--background-navy) 100%);
   min-height: 100vh;
   margin: 0;
   padding: 0;
@@ -13,10 +29,10 @@ body {
   min-height: 100vh;
 }
 
-/* RGB Glow Effects */
+/* EduSpark Brand Glow Effects */
 .card {
   background: rgba(26, 26, 46, 0.8) !important;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border: 1px solid rgba(0, 173, 239, 0.2) !important;
   backdrop-filter: blur(10px);
   transition: all 0.3s ease;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
@@ -26,8 +42,8 @@ body {
   transform: translateY(-2px);
   box-shadow: 
     0 8px 25px rgba(0, 0, 0, 0.4),
-    0 0 20px rgba(255, 0, 100, 0.1);
-  border-color: rgba(255, 0, 100, 0.3) !important;
+    0 0 20px rgba(0, 173, 239, 0.3);
+  border-color: rgba(0, 173, 239, 0.5) !important;
 }
 
 .card-body {
@@ -38,14 +54,14 @@ body {
   color: white !important;
 }
 
-/* Table Styling */
+/* Table Styling - EduSpark Brand */
 .table {
   color: rgba(255, 255, 255, 0.9) !important;
   background: rgba(26, 26, 46, 0.6) !important;
 }
 
 .table thead {
-  background: linear-gradient(135deg, rgba(255, 0, 100, 0.2), rgba(0, 200, 255, 0.2)) !important;
+  background: linear-gradient(135deg, rgba(0, 173, 239, 0.3), rgba(255, 165, 0, 0.2)) !important;
   color: white !important;
 }
 
@@ -60,7 +76,7 @@ body {
 }
 
 .table-hover tbody tr:hover {
-  background: rgba(255, 0, 100, 0.1) !important;
+  background: rgba(0, 173, 239, 0.15) !important;
   color: white !important;
 }
 
@@ -72,44 +88,46 @@ body {
   background: rgba(255, 255, 255, 0.02) !important;
 }
 
-/* Button Enhancements */
+/* Button Enhancements - EduSpark Brand Colors */
 .btn-primary {
-  background: linear-gradient(135deg, #ff0064, #00c8ff) !important;
+  background: linear-gradient(135deg, #00ADEF, #0088CC) !important;
   border: none !important;
-  box-shadow: 0 4px 15px rgba(255, 0, 100, 0.3) !important;
+  box-shadow: 0 4px 15px rgba(0, 173, 239, 0.4) !important;
   transition: all 0.3s ease;
   color: white !important;
 }
 
 .btn-primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(255, 0, 100, 0.4) !important;
+  box-shadow: 0 6px 20px rgba(0, 173, 239, 0.6) !important;
+  background: linear-gradient(135deg, #00ADEF, #00BFFF) !important;
 }
 
 .btn-success {
-  background: linear-gradient(135deg, #64ff00, #00c8ff) !important;
+  background: linear-gradient(135deg, #10B981, #059669) !important;
   border: none !important;
-  box-shadow: 0 4px 15px rgba(100, 255, 0, 0.3) !important;
+  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4) !important;
   color: white !important;
 }
 
 .btn-info {
-  background: linear-gradient(135deg, #00c8ff, #c800ff) !important;
+  background: linear-gradient(135deg, #00ADEF, #3B82F6) !important;
   border: none !important;
-  box-shadow: 0 4px 15px rgba(0, 200, 255, 0.3) !important;
+  box-shadow: 0 4px 15px rgba(0, 173, 239, 0.4) !important;
   color: white !important;
 }
 
 .btn-warning {
-  background: linear-gradient(135deg, #ffc107, #ff6400) !important;
+  background: linear-gradient(135deg, #FFA500, #FF8C00) !important;
   border: none !important;
-  box-shadow: 0 4px 15px rgba(255, 193, 7, 0.3) !important;
+  box-shadow: 0 4px 15px rgba(255, 165, 0, 0.4) !important;
+  color: white !important;
 }
 
 .btn-danger {
-  background: linear-gradient(135deg, #ff0064, #c80000) !important;
+  background: linear-gradient(135deg, #EF4444, #DC2626) !important;
   border: none !important;
-  box-shadow: 0 4px 15px rgba(255, 0, 100, 0.3) !important;
+  box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4) !important;
   color: white !important;
 }
 
@@ -120,13 +138,13 @@ body {
 }
 
 .btn-outline-primary {
-  border: 2px solid #ff0064 !important;
-  color: #ff0064 !important;
+  border: 2px solid #00ADEF !important;
+  color: #00ADEF !important;
   background: transparent !important;
 }
 
 .btn-outline-primary:hover {
-  background: linear-gradient(135deg, #ff0064, #00c8ff) !important;
+  background: linear-gradient(135deg, #00ADEF, #0088CC) !important;
   color: white !important;
   border-color: transparent !important;
 }
@@ -143,25 +161,25 @@ body {
 }
 
 .btn-outline-danger {
-  border: 2px solid #ff0064 !important;
-  color: #ff0064 !important;
+  border: 2px solid #EF4444 !important;
+  color: #EF4444 !important;
   background: transparent !important;
 }
 
 .btn-outline-danger:hover {
-  background: #ff0064 !important;
+  background: #EF4444 !important;
   color: white !important;
   border-color: transparent !important;
 }
 
 .btn-outline-info {
-  border: 2px solid #00c8ff !important;
-  color: #00c8ff !important;
+  border: 2px solid #00ADEF !important;
+  color: #00ADEF !important;
   background: transparent !important;
 }
 
 .btn-outline-info:hover {
-  background: #00c8ff !important;
+  background: #00ADEF !important;
   color: white !important;
   border-color: transparent !important;
 }
@@ -175,8 +193,8 @@ body {
 
 .form-control:focus, .form-select:focus {
   background: rgba(255, 255, 255, 0.08) !important;
-  border-color: rgba(0, 200, 255, 0.5) !important;
-  box-shadow: 0 0 0 0.2rem rgba(0, 200, 255, 0.15) !important;
+  border-color: rgba(0, 173, 239, 0.6) !important;
+  box-shadow: 0 0 0 0.2rem rgba(0, 173, 239, 0.25) !important;
   color: white !important;
 }
 
@@ -243,24 +261,24 @@ body {
 }
 
 .alert-warning {
-  background: rgba(255, 193, 7, 0.2) !important;
-  border-color: rgba(255, 193, 7, 0.4) !important;
-  color: #ffc107 !important;
+  background: rgba(255, 165, 0, 0.2) !important;
+  border-color: rgba(255, 165, 0, 0.4) !important;
+  color: #FFA500 !important;
 }
 
 .alert-success {
-  background: rgba(25, 135, 84, 0.2) !important;
-  border-color: rgba(25, 135, 84, 0.4) !important;
-  color: #64ff00 !important;
+  background: rgba(16, 185, 129, 0.2) !important;
+  border-color: rgba(16, 185, 129, 0.4) !important;
+  color: #10B981 !important;
 }
 
 .alert-info {
-  background: rgba(13, 202, 240, 0.2) !important;
-  border-color: rgba(13, 202, 240, 0.4) !important;
-  color: #0dcaf0 !important;
+  background: rgba(0, 173, 239, 0.2) !important;
+  border-color: rgba(0, 173, 239, 0.4) !important;
+  color: #00ADEF !important;
 }
 
-/* Badge Styling */
+/* Badge Styling - EduSpark Brand */
 .badge {
   font-weight: 600;
   padding: 0.4em 0.8em;
@@ -268,33 +286,33 @@ body {
 }
 
 .bg-primary {
-  background: linear-gradient(135deg, #ff0064, #00c8ff) !important;
+  background: linear-gradient(135deg, #00ADEF, #0088CC) !important;
 }
 
 .bg-success {
-  background: linear-gradient(135deg, #64ff00, #00c8a0) !important;
+  background: linear-gradient(135deg, #10B981, #059669) !important;
 }
 
 .bg-info {
-  background: linear-gradient(135deg, #00c8ff, #0064ff) !important;
+  background: linear-gradient(135deg, #00ADEF, #3B82F6) !important;
 }
 
 .bg-warning {
-  background: linear-gradient(135deg, #ffc107, #ff6400) !important;
+  background: linear-gradient(135deg, #FFA500, #FF8C00) !important;
 }
 
 .bg-danger {
-  background: linear-gradient(135deg, #ff0064, #c80000) !important;
+  background: linear-gradient(135deg, #EF4444, #DC2626) !important;
 }
 
 .bg-secondary {
   background: linear-gradient(135deg, #6c757d, #495057) !important;
 }
 
-/* Spinner */
+/* Spinner - EduSpark Brand */
 .spinner-border {
-  border-color: rgba(255, 0, 100, 0.3);
-  border-right-color: #ff0064;
+  border-color: rgba(0, 173, 239, 0.3);
+  border-right-color: #00ADEF;
 }
 
 .spinner-border-sm {
@@ -312,12 +330,12 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(135deg, #ff0064, #00c8ff);
+  background: linear-gradient(135deg, #00ADEF, #FFA500);
   border-radius: 5px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(135deg, #00c8ff, #ff0064);
+  background: linear-gradient(135deg, #FFA500, #00ADEF);
 }
 
 /* Text Colors */
@@ -351,19 +369,19 @@ p {
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5) !important;
 }
 
-/* RGB Animation */
-@keyframes rgb-glow {
+/* EduSpark Brand Animation */
+@keyframes eduspark-glow {
   0% {
-    box-shadow: 0 0 20px rgba(255, 0, 100, 0.3);
+    box-shadow: 0 0 20px rgba(0, 173, 239, 0.4);
   }
   33% {
-    box-shadow: 0 0 20px rgba(0, 200, 255, 0.3);
+    box-shadow: 0 0 20px rgba(255, 165, 0, 0.4);
   }
   66% {
-    box-shadow: 0 0 20px rgba(100, 255, 0, 0.3);
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
   }
   100% {
-    box-shadow: 0 0 20px rgba(255, 0, 100, 0.3);
+    box-shadow: 0 0 20px rgba(0, 173, 239, 0.4);
   }
 }
 

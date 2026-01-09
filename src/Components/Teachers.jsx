@@ -115,6 +115,29 @@ export const Teachers = () => {
         }
     };
 
+    const handleTogglePaidQuiz = async (teacherId, canCreatePaidQuiz) => {
+        try {
+            setSaving(true);
+            setError(null);
+            
+            const response = await adminAPI.toggleTeacherPaidQuizPermission(teacherId, canCreatePaidQuiz);
+            
+            if (response.success) {
+                // Refresh the teachers list
+                await fetchTeachers();
+            } else {
+                throw new Error(response.message || 'Failed to update paid quiz permission');
+            }
+        } catch (err) {
+            console.error('Error toggling paid quiz permission:', err);
+            setError(err.message || 'Failed to update paid quiz permission');
+            // Refresh to revert the UI state
+            await fetchTeachers();
+        } finally {
+            setSaving(false);
+        }
+    };
+
     if (loading) {
         return (
             <div className="container mt-4">
@@ -164,41 +187,109 @@ export const Teachers = () => {
                     <tr>
                         <th>Name</th>
                         <th>Email Address</th>
-                        <th>Status</th>
+                        <th>Verification Status</th>
+                        <th>Paid Quiz Permission</th>
+                        <th>Total Earnings</th>
+                        <th>Total Withdrawals</th>
+                        <th>Available Balance</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     {teachers.length === 0 ? (
                         <tr>
-                            <td colSpan="4" className="text-center">No teachers found</td>
+                            <td colSpan="8" className="text-center">No teachers found</td>
                         </tr>
                     ) : (
-                        teachers.map((teacher) => (
-                            <tr key={teacher._id}>
-                                <td>{teacher.name || 'N/A'}</td>
-                                <td>{teacher.email}</td>
-                                <td>
-                                    <span className={`badge ${teacher.isVerified ? 'bg-success' : 'bg-warning'}`}>
-                                        {teacher.isVerified ? 'Verified' : 'Unverified'}
-                                    </span>
-                                </td>
-                                <td>
-                                    <button 
-                                        onClick={() => handleEdit(teacher)} 
-                                        className="btn btn-primary btn-sm me-2"
-                                    >
-                                        Edit
-                                    </button>
-                                    <button 
-                                        onClick={() => handleDelete(teacher)} 
-                                        className="btn btn-danger btn-sm"
-                                    >
-                                        Delete
-                                    </button>
-                                </td>
-                            </tr>
-                        ))
+                        teachers.map((teacher) => {
+                            const stats = teacher.financialStats || {};
+                            return (
+                                <tr key={teacher._id}>
+                                    <td>{teacher.name || 'N/A'}</td>
+                                    <td>{teacher.email}</td>
+                                    <td>
+                                        <span className={`badge ${
+                                            teacher.teacherVerification?.status === 'approved' 
+                                                ? 'bg-success' 
+                                                : teacher.teacherVerification?.status === 'pending'
+                                                ? 'bg-warning'
+                                                : teacher.teacherVerification?.status === 'rejected'
+                                                ? 'bg-danger'
+                                                : 'bg-secondary'
+                                        }`}>
+                                            {teacher.teacherVerification?.status === 'approved' 
+                                                ? 'Verified' 
+                                                : teacher.teacherVerification?.status === 'pending'
+                                                ? 'Pending'
+                                                : teacher.teacherVerification?.status === 'rejected'
+                                                ? 'Rejected'
+                                                : 'Not Submitted'}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div className="form-check form-switch">
+                                            <input
+                                                className="form-check-input"
+                                                type="checkbox"
+                                                role="switch"
+                                                id={`paidQuiz-${teacher._id}`}
+                                                checked={teacher.canCreatePaidQuiz || false}
+                                                onChange={(e) => handleTogglePaidQuiz(teacher._id, e.target.checked)}
+                                                disabled={saving}
+                                            />
+                                            <label className="form-check-label" htmlFor={`paidQuiz-${teacher._id}`}>
+                                                {teacher.canCreatePaidQuiz ? (
+                                                    <span className="badge bg-success">Enabled</span>
+                                                ) : (
+                                                    <span className="badge bg-secondary">Disabled</span>
+                                                )}
+                                            </label>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span className="text-success fw-bold">
+                                            ₹{stats.totalEarnings?.toLocaleString('en-IN') || '0'}
+                                        </span>
+                                        <br />
+                                        <small className="text-muted">
+                                            {stats.totalSales || 0} sales
+                                        </small>
+                                    </td>
+                                    <td>
+                                        <span className="text-info fw-bold">
+                                            ₹{stats.totalWithdrawn?.toLocaleString('en-IN') || '0'}
+                                        </span>
+                                        {stats.pendingWithdrawals > 0 && (
+                                            <>
+                                                <br />
+                                                <small className="text-warning">
+                                                    ₹{stats.pendingWithdrawals?.toLocaleString('en-IN')} pending
+                                                </small>
+                                            </>
+                                        )}
+                                    </td>
+                                    <td>
+                                        <span className="text-primary fw-bold">
+                                            ₹{stats.availableBalance?.toLocaleString('en-IN') || '0'}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <button 
+                                            onClick={() => handleEdit(teacher)} 
+                                            className="btn btn-primary btn-sm me-2"
+                                        >
+                                            Edit
+                                        </button>
+                                        <button 
+                                            onClick={() => handleDelete(teacher)} 
+                                            className="btn btn-danger btn-sm"
+                                        >
+                                            Delete
+                                        </button>
+                                    </td>
+                                </tr>
+                            );
+                        })
                     )}
                 </tbody>
             </table>

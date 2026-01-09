@@ -5,10 +5,15 @@ import Dashboard from './Components/Dashboard'
 import { Teachers } from './Components/Teachers'
 import { Students } from './Components/Students'
 import { Courses } from './Components/Courses'
+import { Videos } from './Components/Videos'
 import Login from './Components/Login'
 import ProtectedRoute from './Components/ProtectedRoute'
 import { useAuth } from './context/AuthContext'
 import { Test } from './Components/Test'
+import { Withdrawals } from './Components/Withdrawals'
+import { KYC } from './Components/KYC'
+import { Support } from './Components/Support'
+import { Feedback } from './Components/Feedback'
 
 function App() {
   const { isAuthenticated } = useAuth();
@@ -71,6 +76,19 @@ function App() {
         </ProtectedRoute>
       } />
       
+      <Route path='/videos' element={
+        <ProtectedRoute>
+          <div className='row'>
+            <div className='col-lg-3 col-sm-12 col-md-3'>
+              <Sidebar/>
+            </div>
+            <div className='col-lg-9 col-sm-12 col-md-9'>
+              <Videos/>
+            </div>
+          </div>
+        </ProtectedRoute>
+      } />
+      
       <Route path='/test' element={
         <ProtectedRoute>
           <div className='row'>
@@ -79,6 +97,58 @@ function App() {
             </div>
             <div className='col-lg-9 col-sm-12 col-md-9'>
               <Test/>
+            </div>
+          </div>
+        </ProtectedRoute>
+      } />
+      
+      <Route path='/withdrawals' element={
+        <ProtectedRoute>
+          <div className='row'>
+            <div className='col-lg-3 col-sm-12 col-md-3'>
+              <Sidebar/>
+            </div>
+            <div className='col-lg-9 col-sm-12 col-md-9'>
+              <Withdrawals/>
+            </div>
+          </div>
+        </ProtectedRoute>
+      } />
+      
+      <Route path='/kyc' element={
+        <ProtectedRoute>
+          <div className='row'>
+            <div className='col-lg-3 col-sm-12 col-md-3'>
+              <Sidebar/>
+            </div>
+            <div className='col-lg-9 col-sm-12 col-md-9'>
+              <KYC/>
+            </div>
+          </div>
+        </ProtectedRoute>
+      } />
+      
+      <Route path='/support' element={
+        <ProtectedRoute>
+          <div className='row'>
+            <div className='col-lg-3 col-sm-12 col-md-3'>
+              <Sidebar/>
+            </div>
+            <div className='col-lg-9 col-sm-12 col-md-9'>
+              <Support/>
+            </div>
+          </div>
+        </ProtectedRoute>
+      } />
+      
+      <Route path='/feedback' element={
+        <ProtectedRoute>
+          <div className='row'>
+            <div className='col-lg-3 col-sm-12 col-md-3'>
+              <Sidebar/>
+            </div>
+            <div className='col-lg-9 col-sm-12 col-md-9'>
+              <Feedback/>
             </div>
           </div>
         </ProtectedRoute>

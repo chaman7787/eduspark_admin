@@ -164,41 +164,76 @@ export const Students = () => {
                     <tr>
                         <th>Name</th>
                         <th>Email Address</th>
-                        <th>Status</th>
+                        <th>Verification Status</th>
+                        <th>Total Spent</th>
+                        <th>Total Purchases</th>
+                        <th>Enrolled Courses</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     {students.length === 0 ? (
                         <tr>
-                            <td colSpan="4" className="text-center">No students found</td>
+                            <td colSpan="7" className="text-center">No students found</td>
                         </tr>
                     ) : (
-                        students.map(st => (
-                            <tr key={st._id}>
-                                <td>{st.name || 'N/A'}</td>
-                                <td>{st.email}</td>
-                                <td>
-                                    <span className={`badge ${st.isVerified ? 'bg-success' : 'bg-warning'}`}>
-                                        {st.isVerified ? 'Verified' : 'Unverified'}
-                                    </span>
-                                </td>
-                                <td>
-                                    <button 
-                                        onClick={() => handleEdit(st)} 
-                                        className="btn btn-primary btn-sm me-2"
-                                    >
-                                        Edit
-                                    </button>
-                                    <button 
-                                        onClick={() => handleDelete(st)} 
-                                        className="btn btn-danger btn-sm"
-                                    >
-                                        Delete
-                                    </button>
-                                </td>
-                            </tr>
-                        ))
+                        students.map(st => {
+                            const stats = st.financialStats || {};
+                            return (
+                                <tr key={st._id}>
+                                    <td>{st.name || 'N/A'}</td>
+                                    <td>{st.email}</td>
+                                    <td>
+                                        <span className={`badge ${
+                                            st.studentVerification?.status === 'approved' 
+                                                ? 'bg-success' 
+                                                : st.studentVerification?.status === 'pending'
+                                                ? 'bg-warning'
+                                                : st.studentVerification?.status === 'rejected'
+                                                ? 'bg-danger'
+                                                : 'bg-secondary'
+                                        }`}>
+                                            {st.studentVerification?.status === 'approved' 
+                                                ? 'Verified' 
+                                                : st.studentVerification?.status === 'pending'
+                                                ? 'Pending'
+                                                : st.studentVerification?.status === 'rejected'
+                                                ? 'Rejected'
+                                                : 'Not Submitted'}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span className="text-danger fw-bold">
+                                            ₹{stats.totalSpent?.toLocaleString('en-IN') || '0'}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span className="badge bg-info">
+                                            {stats.totalPurchases || 0}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span className="badge bg-primary">
+                                            {stats.enrolledCourses || 0}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <button 
+                                            onClick={() => handleEdit(st)} 
+                                            className="btn btn-primary btn-sm me-2"
+                                        >
+                                            Edit
+                                        </button>
+                                        <button 
+                                            onClick={() => handleDelete(st)} 
+                                            className="btn btn-danger btn-sm"
+                                        >
+                                            Delete
+                                        </button>
+                                    </td>
+                                </tr>
+                            );
+                        })
                     )}
                 </tbody>
             </table>

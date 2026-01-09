@@ -49,11 +49,11 @@ const Login = () => {
         <div className="login-card-glow"></div>
         
         <div className="login-header">
-          <div className="logo-circle">
-            <span className="logo-text">A</span>
+          <div className="logo-container">
+            <img src="/logo.png" alt="EduSpark" className="logo-image" />
           </div>
-          <h2 className="login-title">Admin Panel</h2>
-          <p className="login-subtitle">Sign in to continue</p>
+          <h2 className="login-title">Welcome</h2>
+          <p className="login-subtitle">Education and Energy, Inspiration and Creativity</p>
         </div>
 
         {error && (
@@ -153,7 +153,7 @@ const Login = () => {
         .rgb-circle-1 {
           width: 500px;
           height: 500px;
-          background: radial-gradient(circle, rgba(255, 0, 100, 0.8), transparent);
+          background: radial-gradient(circle, rgba(0, 173, 239, 0.6), transparent);
           top: -100px;
           left: -100px;
           animation-delay: 0s;
@@ -162,7 +162,7 @@ const Login = () => {
         .rgb-circle-2 {
           width: 400px;
           height: 400px;
-          background: radial-gradient(circle, rgba(0, 200, 255, 0.8), transparent);
+          background: radial-gradient(circle, rgba(255, 165, 0, 0.6), transparent);
           bottom: -100px;
           right: -100px;
           animation-delay: 5s;
@@ -171,7 +171,7 @@ const Login = () => {
         .rgb-circle-3 {
           width: 450px;
           height: 450px;
-          background: radial-gradient(circle, rgba(100, 255, 0, 0.8), transparent);
+          background: radial-gradient(circle, rgba(255, 215, 0, 0.5), transparent);
           top: 50%;
           left: 50%;
           transform: translate(-50%, -50%);
@@ -211,9 +211,9 @@ const Login = () => {
           inset: -2px;
           background: linear-gradient(
             135deg,
-            rgba(255, 0, 100, 0.5),
-            rgba(0, 200, 255, 0.5),
-            rgba(100, 255, 0, 0.5)
+            rgba(0, 173, 239, 0.5),
+            rgba(255, 165, 0, 0.5),
+            rgba(255, 215, 0, 0.4)
           );
           border-radius: 24px;
           z-index: -1;
@@ -237,35 +237,34 @@ const Login = () => {
           margin-bottom: 2.5rem;
         }
 
-        .logo-circle {
-          width: 80px;
-          height: 80px;
+        .logo-container {
+          width: 120px;
+          height: 120px;
           margin: 0 auto 1.5rem;
-          background: linear-gradient(135deg, #ff0064, #00c8ff, #64ff00);
-          border-radius: 50%;
           display: flex;
           align-items: center;
           justify-content: center;
-          box-shadow: 
-            0 0 30px rgba(255, 0, 100, 0.5),
-            0 0 60px rgba(0, 200, 255, 0.3);
-          animation: logo-rotate 10s linear infinite;
+          position: relative;
         }
 
-        @keyframes logo-rotate {
-          0% {
-            filter: hue-rotate(0deg);
-          }
-          100% {
-            filter: hue-rotate(360deg);
-          }
+        .logo-image {
+          width: 100%;
+          height: 100%;
+          object-fit: contain;
+          filter: drop-shadow(0 0 30px rgba(0, 173, 239, 0.6))
+                  drop-shadow(0 0 60px rgba(255, 165, 0, 0.4));
+          animation: logo-glow 3s ease-in-out infinite;
         }
 
-        .logo-text {
-          font-size: 2.5rem;
-          font-weight: bold;
-          color: white;
-          text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+        @keyframes logo-glow {
+          0%, 100% {
+            filter: drop-shadow(0 0 30px rgba(0, 173, 239, 0.6))
+                    drop-shadow(0 0 60px rgba(255, 165, 0, 0.4));
+          }
+          50% {
+            filter: drop-shadow(0 0 40px rgba(0, 173, 239, 0.8))
+                    drop-shadow(0 0 80px rgba(255, 165, 0, 0.6));
+          }
         }
 
         .login-title {
@@ -273,7 +272,7 @@ const Login = () => {
           font-size: 2rem;
           font-weight: 700;
           margin-bottom: 0.5rem;
-          background: linear-gradient(135deg, #ff0064, #00c8ff);
+          background: linear-gradient(135deg, #00ADEF, #FFA500);
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
           background-clip: text;
@@ -305,7 +304,7 @@ const Login = () => {
         }
 
         .form-label-rgb i {
-          background: linear-gradient(135deg, #ff0064, #00c8ff);
+          background: linear-gradient(135deg, #00ADEF, #FFA500);
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
           background-clip: text;
@@ -325,10 +324,10 @@ const Login = () => {
 
         .form-control-rgb:focus {
           background: rgba(255, 255, 255, 0.08);
-          border-color: rgba(0, 200, 255, 0.5);
+          border-color: rgba(0, 173, 239, 0.6);
           box-shadow: 
-            0 0 0 3px rgba(0, 200, 255, 0.1),
-            0 0 20px rgba(0, 200, 255, 0.2);
+            0 0 0 3px rgba(0, 173, 239, 0.15),
+            0 0 20px rgba(0, 173, 239, 0.3);
         }
 
         .form-control-rgb::placeholder {
@@ -344,7 +343,7 @@ const Login = () => {
         .btn-rgb {
           width: 100%;
           padding: 1rem;
-          background: linear-gradient(135deg, #ff0064, #00c8ff);
+          background: linear-gradient(135deg, #00ADEF, #0088CC);
           border: none;
           border-radius: 12px;
           color: white;
@@ -355,8 +354,8 @@ const Login = () => {
           position: relative;
           overflow: hidden;
           box-shadow: 
-            0 4px 15px rgba(255, 0, 100, 0.3),
-            0 0 30px rgba(0, 200, 255, 0.2);
+            0 4px 15px rgba(0, 173, 239, 0.4),
+            0 0 30px rgba(0, 173, 239, 0.3);
         }
 
         .btn-rgb::before {
@@ -375,8 +374,8 @@ const Login = () => {
         .btn-rgb:hover {
           transform: translateY(-2px);
           box-shadow: 
-            0 6px 25px rgba(255, 0, 100, 0.4),
-            0 0 40px rgba(0, 200, 255, 0.3);
+            0 6px 25px rgba(0, 173, 239, 0.6),
+            0 0 40px rgba(0, 173, 239, 0.4);
         }
 
         .btn-rgb:active {
@@ -411,9 +410,9 @@ const Login = () => {
           background: linear-gradient(
             90deg,
             transparent,
-            rgba(255, 0, 100, 0.5),
-            rgba(0, 200, 255, 0.5),
-            rgba(100, 255, 0, 0.5),
+            rgba(0, 173, 239, 0.6),
+            rgba(255, 165, 0, 0.6),
+            rgba(255, 215, 0, 0.5),
             transparent
           );
           margin-bottom: 1rem;

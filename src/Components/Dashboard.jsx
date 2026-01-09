@@ -4,7 +4,6 @@ import { adminAPI } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 
 const Dashboard = () => {
-    const { adminData } = useAuth();
     const [stats, setStats] = useState({
         totalStudents: 0,
         totalTeachers: 0,
@@ -43,12 +42,6 @@ const Dashboard = () => {
         }
     };
 
-    // Get initials from name
-    const getInitials = (name) => {
-        if (!name) return 'A';
-        return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
-    };
-
     const statCards = [
         { id: 1, title: 'Total Students', value: stats.totalStudents, variant: 'primary' },
         { id: 2, title: 'Total Teachers', value: stats.totalTeachers, variant: 'success' },
@@ -83,64 +76,6 @@ const Dashboard = () => {
 
     return (
         <div className="container py-4">
-            {/* Admin Welcome Section */}
-            {adminData && (
-                <div className="card mb-4" style={{
-                    background: 'linear-gradient(135deg, rgba(255, 0, 100, 0.1), rgba(0, 200, 255, 0.1))',
-                    border: '1px solid rgba(255, 255, 255, 0.2)',
-                    borderRadius: '15px'
-                }}>
-                    <div className="card-body p-4">
-                        <div className="d-flex align-items-center gap-3">
-                            <div style={{
-                                width: '70px',
-                                height: '70px',
-                                borderRadius: '50%',
-                                background: 'linear-gradient(135deg, #ff0064, #00c8ff)',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                fontWeight: 'bold',
-                                fontSize: '1.5rem',
-                                color: 'white',
-                                boxShadow: '0 0 30px rgba(255, 0, 100, 0.4), 0 0 60px rgba(0, 200, 255, 0.3)',
-                                flexShrink: 0
-                            }}>
-                                {getInitials(adminData.name)}
-                            </div>
-                            <div className="flex-grow-1">
-                                <h4 className="mb-1" style={{
-                                    background: 'linear-gradient(135deg, #ff0064, #00c8ff)',
-                                    WebkitBackgroundClip: 'text',
-                                    WebkitTextFillColor: 'transparent',
-                                    backgroundClip: 'text',
-                                    fontWeight: 'bold'
-                                }}>
-                                    Welcome back, {adminData.name || 'Admin'}!
-                                </h4>
-                                <p className="mb-0 text-muted">
-                                    <i className="bi bi-envelope-fill me-2"></i>
-                                    {adminData.email}
-                                </p>
-                                <p className="mb-0 text-muted small mt-1">
-                                    <i className="bi bi-shield-check me-2"></i>
-                                    Role: Administrator
-                                </p>
-                            </div>
-                            <div className="text-end">
-                                <p className="mb-0 small text-muted">Today</p>
-                                <p className="mb-0 fw-bold">{new Date().toLocaleDateString('en-US', { 
-                                    weekday: 'short', 
-                                    year: 'numeric', 
-                                    month: 'short', 
-                                    day: 'numeric' 
-                                })}</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )}
-
             <h2 className="mb-4">Dashboard Overview</h2>
             <div className="row g-3">
                 {statCards.map((s) => (
